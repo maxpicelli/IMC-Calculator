@@ -1043,6 +1043,29 @@
       text-align: left;
     }
 
+    .pix-qr-wrap {
+      width: 100%;
+      max-width: 220px;
+      background: rgba(255,255,255,0.95);
+      border-radius: 20px;
+      padding: 14px;
+      border: 1px solid rgba(255,255,255,0.18);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.18);
+    }
+
+    .pix-qr-wrap img {
+      width: 100%;
+      display: block;
+      border-radius: 12px;
+    }
+
+    .pix-note {
+      font-size: 0.8rem;
+      line-height: 1.6;
+      color: #cbd5e1;
+      max-width: 300px;
+    }
+
     .btn-pix {
       display: inline-flex;
       align-items: center;
@@ -1719,6 +1742,12 @@
         </div>
         <h3>Contribua via Pix</h3>
         <p>Rápido, gratuito e direto. Qualquer valor é muito bem-vindo e ajuda a manter o projeto vivo!</p>
+
+        <div class="pix-qr-wrap">
+          <img src="IMG_6339.PNG" alt="QR Code Pix para apoiar o projeto" />
+        </div>
+
+        <p class="pix-note">Escaneie o QR Code ou copie a chave Pix. O valor pode ser alterado na hora do pagamento.</p>
 
         <div class="pix-key-box">
           <span class="pix-key-value" id="pixKeyText">picelli1974@icloud.com</span>
