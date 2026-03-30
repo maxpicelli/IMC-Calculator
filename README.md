@@ -33,6 +33,12 @@ index.html   ← Arquivo único com HTML + CSS + JS inline
 README.md    ← Esta documentação
 ```
 
+## 🌐 Links
+- **Repositório:** https://github.com/maxpicelli/IMC-Calculator
+- **GitHub Pages:** https://maxpicelli.github.io/IMC-Calculator/
+
+> Se a URL da GitHub Pages abrir `404`, basta ativar em **Settings > Pages** no repositório e publicar a branch `main` na pasta raiz (`/root`).
+
 ## 🔗 Links de Contato / Suporte
 - **Email:** picelli1974@icloud.com
 - **PayPal:** picelli1974@outlook.com
