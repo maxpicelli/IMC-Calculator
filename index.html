@@ -1,0 +1,1934 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="IMC Calculator – Acompanhamento inteligente de peso e saúde para nutricionistas e pacientes. App exclusivo para macOS." />
+  <meta name="keywords" content="IMC, calculadora IMC, saúde, nutricionista, peso, macOS, obesidade" />
+  <meta property="og:title" content="IMC Calculator – Saúde e Bem-Estar no macOS" />
+  <meta property="og:description" content="Acompanhe o IMC, controle diário de peso, relatórios e muito mais para nutricionistas e pacientes." />
+  <title>IMC Calculator – Saúde Inteligente para macOS</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.0/css/all.min.css" />
+
+  <style>
+    /* =============================================
+       RESET & BASE
+    ============================================= */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue:       #3b82f6;
+      --blue-dark:  #2563eb;
+      --blue-deep:  #274690;
+      --green:      #10b981;
+      --green-dark: #059669;
+      --teal:       #0ea5e9;
+      --dark:       #10233f;
+      --mid:        #355070;
+      --light:      #f8fbff;
+      --glass:      rgba(255,255,255,0.08);
+      --glass-b:    rgba(255,255,255,0.15);
+      --radius:     18px;
+      --radius-sm:  10px;
+      --shadow:     0 8px 32px rgba(0,0,0,0.25);
+      --shadow-lg:  0 20px 60px rgba(0,0,0,0.4);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(180deg, #16345d 0%, #133154 28%, #102845 55%, #0d2036 100%);
+      color: #e2e8f0;
+      overflow-x: hidden;
+      line-height: 1.65;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; display: block; }
+
+    /* =============================================
+       ANIMATIONS
+    ============================================= */
+    @keyframes gradientShift {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    @keyframes floatY {
+      0%, 100% { transform: translateY(0px); }
+      50%       { transform: translateY(-18px); }
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(40px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeInLeft {
+      from { opacity: 0; transform: translateX(-40px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes fadeInRight {
+      from { opacity: 0; transform: translateX(40px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes pulse-ring {
+      0%   { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(37,99,235,0.5); }
+      70%  { transform: scale(1);    box-shadow: 0 0 0 18px rgba(37,99,235,0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(37,99,235,0); }
+    }
+
+    @keyframes heartbeat {
+      0%,100% { transform: scale(1); }
+      14%     { transform: scale(1.18); }
+      28%     { transform: scale(1); }
+      42%     { transform: scale(1.12); }
+      70%     { transform: scale(1); }
+    }
+
+    @keyframes particleFloat {
+      0%   { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0.6; }
+      33%  { transform: translateY(-120px) translateX(30px) rotate(120deg); opacity: 0.3; }
+      66%  { transform: translateY(-200px) translateX(-20px) rotate(240deg); opacity: 0.5; }
+      100% { transform: translateY(-300px) translateX(10px) rotate(360deg); opacity: 0; }
+    }
+
+    @keyframes spin-slow {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+
+    @keyframes shimmer {
+      0%   { background-position: -200% center; }
+      100% { background-position: 200% center; }
+    }
+
+    @keyframes drawLine {
+      from { stroke-dashoffset: 300; }
+      to   { stroke-dashoffset: 0; }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* =============================================
+       NAVBAR
+    ============================================= */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 1000;
+      padding: 16px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      background: rgba(28, 58, 104, 0.72);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      transition: background 0.3s;
+    }
+
+    nav.scrolled {
+      background: rgba(23, 49, 87, 0.94);
+      box-shadow: 0 4px 30px rgba(0,0,0,0.4);
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .nav-logo img {
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+    }
+
+    .nav-logo span {
+      font-weight: 700;
+      font-size: 1.1rem;
+      background: linear-gradient(90deg, #60a5fa, #34d399);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: #cbd5e1;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: #fff; }
+
+    .nav-cta {
+      background: linear-gradient(135deg, var(--blue), var(--teal));
+      color: #fff !important;
+      padding: 10px 22px;
+      border-radius: 50px;
+      font-weight: 600 !important;
+      font-size: 0.85rem !important;
+      transition: transform 0.2s, box-shadow 0.2s !important;
+    }
+
+    .nav-cta:hover {
+      transform: translateY(-2px) !important;
+      box-shadow: 0 8px 24px rgba(37,99,235,0.45) !important;
+    }
+
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: 4px;
+    }
+
+    .hamburger span {
+      width: 24px; height: 2px;
+      background: #e2e8f0;
+      border-radius: 2px;
+      transition: 0.3s;
+    }
+
+    /* =============================================
+       HERO SECTION
+    ============================================= */
+    #hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      background: linear-gradient(135deg, #274472 0%, #325f9b 28%, #3a7bbf 58%, #4b9ad1 82%, #2d8d7d 100%);
+      background-size: 300% 300%;
+      animation: gradientShift 12s ease infinite;
+      padding-top: 80px;
+    }
+
+    /* Particles */
+    .particles-container {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .particle {
+      position: absolute;
+      border-radius: 50%;
+      animation: particleFloat linear infinite;
+    }
+
+    /* ECG line SVG decoration */
+    .ecg-bg {
+      position: absolute;
+      bottom: 80px;
+      left: 0;
+      right: 0;
+      opacity: 0.12;
+      pointer-events: none;
+    }
+
+    .ecg-path {
+      stroke-dasharray: 300;
+      stroke-dashoffset: 300;
+      animation: drawLine 3s ease forwards 1s;
+    }
+
+    /* Grid decoration */
+    .hero-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(191,219,254,0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(191,219,254,0.1) 1px, transparent 1px);
+      background-size: 50px 50px;
+      pointer-events: none;
+    }
+
+    /* Glowing orbs */
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      animation: floatY 8s ease-in-out infinite;
+    }
+
+    .orb-1 {
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(147,197,253,0.28), transparent 70%);
+      top: -100px; left: -100px;
+    }
+
+    .orb-2 {
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(16,185,129,0.2), transparent 70%);
+      bottom: -80px; right: 10%;
+      animation-delay: -3s;
+    }
+
+    .orb-3 {
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(125,211,252,0.22), transparent 70%);
+      top: 40%; left: 40%;
+      animation-delay: -5s;
+    }
+
+    .hero-container {
+      position: relative;
+      z-index: 10;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 40px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+    }
+
+    .hero-content { animation: fadeInLeft 0.9s ease both 0.2s; }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      padding: 8px 16px;
+      border-radius: 50px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #a5f3fc;
+      margin-bottom: 24px;
+      backdrop-filter: blur(10px);
+    }
+
+    .hero-badge i { color: #fff; }
+
+    .hero-title {
+      font-size: clamp(2.2rem, 5vw, 3.6rem);
+      font-weight: 900;
+      line-height: 1.12;
+      margin-bottom: 20px;
+      letter-spacing: -1.5px;
+    }
+
+    .hero-title .gradient-text {
+      background: linear-gradient(135deg, #60a5fa, #34d399, #a78bfa);
+      background-size: 200% 200%;
+      animation: gradientShift 5s ease infinite;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-subtitle {
+      font-size: 1.15rem;
+      color: #94a3b8;
+      max-width: 480px;
+      margin-bottom: 36px;
+      line-height: 1.75;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: linear-gradient(135deg, var(--blue), #3b82f6);
+      color: #fff;
+      padding: 16px 32px;
+      border-radius: 50px;
+      font-weight: 700;
+      font-size: 1rem;
+      box-shadow: 0 8px 32px rgba(37,99,235,0.45);
+      transition: transform 0.25s, box-shadow 0.25s;
+      animation: pulse-ring 3s infinite 2s;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px) scale(1.03);
+      box-shadow: 0 16px 48px rgba(37,99,235,0.6);
+      animation: none;
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.25);
+      color: #e2e8f0;
+      padding: 16px 28px;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      backdrop-filter: blur(10px);
+      transition: all 0.25s;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255,255,255,0.2);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    }
+
+    .hero-stats {
+      display: flex;
+      gap: 32px;
+      margin-top: 40px;
+    }
+
+    .hero-stat {
+      text-align: center;
+    }
+
+    .hero-stat .num {
+      font-size: 1.8rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #60a5fa, #34d399);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-stat .label {
+      font-size: 0.78rem;
+      color: #64748b;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .hero-visual {
+      animation: fadeInRight 0.9s ease both 0.4s;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .app-showcase {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .app-icon-wrapper {
+      position: relative;
+      animation: floatY 5s ease-in-out infinite;
+    }
+
+    .app-icon-wrapper::before {
+      content: '';
+      position: absolute;
+      inset: -20px;
+      border-radius: 40%;
+      background: conic-gradient(from 0deg, #2563eb, #10b981, #a78bfa, #2563eb);
+      animation: spin-slow 6s linear infinite;
+      opacity: 0.5;
+      filter: blur(8px);
+    }
+
+    .app-icon-wrapper img {
+      position: relative;
+      z-index: 1;
+      width: 120px;
+      height: 120px;
+      border-radius: 26px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+
+    /* macOS window mockup */
+    .macos-window {
+      width: 100%;
+      max-width: 480px;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+      border: 1px solid rgba(255,255,255,0.1);
+      animation: floatY 7s ease-in-out infinite;
+      animation-delay: -2s;
+    }
+
+    .macos-titlebar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 16px;
+      background: #2d2d2d;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .macos-dot {
+      width: 12px; height: 12px;
+      border-radius: 50%;
+    }
+
+    .dot-red   { background: #ff5f57; }
+    .dot-yellow{ background: #ffbd2e; }
+    .dot-green { background: #28c840; }
+
+    .macos-title {
+      flex: 1;
+      text-align: center;
+      font-size: 0.8rem;
+      color: #888;
+      font-weight: 500;
+    }
+
+    .macos-screenshot {
+      width: 100%;
+      display: block;
+      object-fit: cover;
+    }
+
+    /* =============================================
+       SECTIONS COMMON
+    ============================================= */
+    section {
+      padding: 100px 40px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .section-full {
+      max-width: 100%;
+      padding: 100px 0;
+    }
+
+    .section-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 40px;
+    }
+
+    .section-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(37,99,235,0.15);
+      border: 1px solid rgba(37,99,235,0.35);
+      color: #60a5fa;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 50px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 16px;
+    }
+
+    .section-tag.green {
+      background: rgba(16,185,129,0.15);
+      border-color: rgba(16,185,129,0.35);
+      color: #34d399;
+    }
+
+    h2.section-title {
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 800;
+      line-height: 1.2;
+      letter-spacing: -1px;
+      margin-bottom: 16px;
+      color: #f1f5f9;
+    }
+
+    .section-sub {
+      font-size: 1.05rem;
+      color: #64748b;
+      max-width: 560px;
+      line-height: 1.75;
+      margin-bottom: 60px;
+    }
+
+    /* Divider line gradient */
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(37,99,235,0.4), rgba(16,185,129,0.4), transparent);
+      margin: 0;
+    }
+
+    /* =============================================
+       FEATURES SECTION
+    ============================================= */
+    #features {
+      background: linear-gradient(180deg, #12294a 0%, #102540 100%);
+      max-width: 100%;
+      padding: 100px 0;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 28px;
+    }
+
+    .feature-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: var(--radius);
+      padding: 36px 30px;
+      position: relative;
+      overflow: hidden;
+      cursor: default;
+      transition: transform 0.35s ease, box-shadow 0.35s ease, background 0.35s ease, border-color 0.35s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--blue), var(--green));
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.35s ease;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 24px 64px rgba(37,99,235,0.2);
+      background: rgba(255,255,255,0.07);
+      border-color: rgba(37,99,235,0.3);
+    }
+
+    .feature-card:hover::before { transform: scaleX(1); }
+
+    .feature-icon {
+      width: 56px; height: 56px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, rgba(37,99,235,0.25), rgba(16,185,129,0.15));
+      border: 1px solid rgba(37,99,235,0.25);
+      transition: transform 0.3s;
+    }
+
+    .feature-card:hover .feature-icon { transform: scale(1.1) rotate(-5deg); }
+
+    .feature-card h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: #f1f5f9;
+    }
+
+    .feature-card p {
+      font-size: 0.9rem;
+      color: #64748b;
+      line-height: 1.65;
+    }
+
+    .feature-card .feature-badge {
+      display: inline-block;
+      margin-top: 14px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #34d399;
+      background: rgba(16,185,129,0.12);
+      border: 1px solid rgba(16,185,129,0.25);
+      padding: 4px 10px;
+      border-radius: 50px;
+    }
+
+    /* =============================================
+       FOR WHOM SECTION
+    ============================================= */
+    #forwho {
+      background: #143052;
+    }
+
+    .forwho-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+    }
+
+    .forwho-card {
+      border-radius: var(--radius);
+      padding: 48px 40px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .forwho-card:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .forwho-card.professional {
+      background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #1d4ed8 100%);
+      border: 1px solid rgba(37,99,235,0.4);
+    }
+
+    .forwho-card.patient {
+      background: linear-gradient(135deg, #064e3b 0%, #065f46 50%, #047857 100%);
+      border: 1px solid rgba(16,185,129,0.4);
+    }
+
+    .forwho-card::after {
+      content: '';
+      position: absolute;
+      top: -60px; right: -60px;
+      width: 180px; height: 180px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.05);
+      pointer-events: none;
+    }
+
+    .forwho-icon {
+      font-size: 3rem;
+      margin-bottom: 20px;
+      animation: heartbeat 2.5s ease-in-out infinite;
+    }
+
+    .forwho-card h3 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin-bottom: 12px;
+      color: #fff;
+    }
+
+    .forwho-card > p {
+      font-size: 0.95rem;
+      color: rgba(255,255,255,0.7);
+      margin-bottom: 24px;
+      line-height: 1.7;
+    }
+
+    .forwho-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .forwho-list li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.9rem;
+      color: rgba(255,255,255,0.85);
+    }
+
+    .forwho-list li i {
+      color: #34d399;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+    }
+
+    /* =============================================
+       IMC TABLE SECTION
+    ============================================= */
+    #imc-table {
+      background: linear-gradient(180deg, #102540 0%, #0e2139 100%);
+      max-width: 100%;
+      padding: 100px 0;
+    }
+
+    .imc-table-wrapper {
+      overflow-x: auto;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-lg);
+      border: 1px solid rgba(255,255,255,0.07);
+    }
+
+    table.imc-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+      min-width: 540px;
+    }
+
+    table.imc-table thead th {
+      background: rgba(37,99,235,0.2);
+      color: #94a3b8;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      padding: 16px 24px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+
+    table.imc-table tbody tr {
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      transition: background 0.2s;
+      cursor: default;
+    }
+
+    table.imc-table tbody tr:hover { background: rgba(255,255,255,0.04); }
+
+    table.imc-table tbody td {
+      padding: 18px 24px;
+      color: #cbd5e1;
+    }
+
+    .imc-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      font-size: 0.88rem;
+      padding: 6px 14px;
+      border-radius: 50px;
+    }
+
+    .imc-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .imc-row-1 .imc-badge { background: rgba(56,189,248,0.15); color: #38bdf8; }
+    .imc-row-1 .imc-dot  { background: #38bdf8; }
+    .imc-row-2 .imc-badge { background: rgba(52,211,153,0.15); color: #34d399; }
+    .imc-row-2 .imc-dot  { background: #34d399; }
+    .imc-row-3 .imc-badge { background: rgba(251,191,36,0.15); color: #fbbf24; }
+    .imc-row-3 .imc-dot  { background: #fbbf24; }
+    .imc-row-4 .imc-badge { background: rgba(251,146,60,0.15); color: #fb923c; }
+    .imc-row-4 .imc-dot  { background: #fb923c; }
+    .imc-row-5 .imc-badge { background: rgba(249,115,22,0.15); color: #f97316; }
+    .imc-row-5 .imc-dot  { background: #f97316; }
+    .imc-row-6 .imc-badge { background: rgba(239,68,68,0.15); color: #ef4444; }
+    .imc-row-6 .imc-dot  { background: #ef4444; }
+
+    /* Progress bar in IMC table */
+    .imc-bar-container {
+      height: 6px;
+      background: rgba(255,255,255,0.07);
+      border-radius: 3px;
+      overflow: hidden;
+      min-width: 120px;
+    }
+
+    .imc-bar {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 1.2s ease;
+    }
+
+    /* =============================================
+       SCREENSHOT SECTION
+    ============================================= */
+    #screenshot {
+      background: #143052;
+      text-align: center;
+    }
+
+    .screenshot-wrap {
+      position: relative;
+      display: inline-block;
+      margin-top: 20px;
+    }
+
+    .screenshot-glow {
+      position: absolute;
+      inset: -40px;
+      border-radius: 30px;
+      background: radial-gradient(ellipse at center, rgba(37,99,235,0.25) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .screenshot-macos {
+      position: relative;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 40px 100px rgba(0,0,0,0.7);
+      border: 1px solid rgba(255,255,255,0.08);
+      max-width: 860px;
+      margin: 0 auto;
+    }
+
+    .screenshot-macos .macos-titlebar {
+      padding: 14px 18px;
+    }
+
+    .screenshot-macos img {
+      width: 100%;
+      display: block;
+    }
+
+    /* =============================================
+       SUPPORT SECTION
+    ============================================= */
+    #support {
+      background: linear-gradient(180deg, #0f2540 0%, #143052 100%);
+    }
+
+    .support-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      margin-top: 60px;
+    }
+
+    .support-card {
+      border-radius: var(--radius);
+      padding: 44px 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 20px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .support-card:hover {
+      transform: translateY(-8px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .support-card.coffee {
+      background: linear-gradient(135deg, #1c1c1c 0%, #2d1a0e 50%, #3d2410 100%);
+      border: 1px solid rgba(251,191,36,0.25);
+    }
+
+    .support-card.coffee::before {
+      content: '';
+      position: absolute;
+      top: -80px; right: -80px;
+      width: 250px; height: 250px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(251,191,36,0.08), transparent 70%);
+    }
+
+    .support-card.pix {
+      background: linear-gradient(135deg, #0a1a0f 0%, #0d2d1a 50%, #103d24 100%);
+      border: 1px solid rgba(16,185,129,0.3);
+    }
+
+    .support-card.pix::before {
+      content: '';
+      position: absolute;
+      top: -80px; right: -80px;
+      width: 250px; height: 250px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(16,185,129,0.08), transparent 70%);
+    }
+
+    .support-icon {
+      font-size: 3rem;
+      line-height: 1;
+    }
+
+    .support-card h3 {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: #f1f5f9;
+    }
+
+    .support-card p {
+      font-size: 0.95rem;
+      color: #64748b;
+      line-height: 1.7;
+      max-width: 320px;
+    }
+
+    .support-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      width: 100%;
+      max-width: 300px;
+    }
+
+    .btn-coffee {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: linear-gradient(135deg, #ffdd00, #ffa500);
+      color: #1a0a00;
+      font-weight: 700;
+      font-size: 0.95rem;
+      padding: 14px 28px;
+      border-radius: 50px;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.25s, box-shadow 0.25s;
+      box-shadow: 0 8px 24px rgba(255,191,0,0.3);
+    }
+
+    .btn-coffee:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 16px 40px rgba(255,191,0,0.45);
+    }
+
+    .paypal-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: rgba(0,112,186,0.15);
+      border: 1px solid rgba(0,112,186,0.45);
+      color: #60a5fa;
+      font-weight: 600;
+      font-size: 0.9rem;
+      padding: 13px 28px;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.25s;
+      text-align: center;
+    }
+
+    .paypal-btn:hover {
+      background: rgba(0,112,186,0.3);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0,112,186,0.3);
+    }
+
+    .pix-key-box {
+      width: 100%;
+      max-width: 300px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(16,185,129,0.25);
+      border-radius: var(--radius-sm);
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .pix-key-value {
+      font-size: 0.85rem;
+      color: #34d399;
+      font-weight: 600;
+      word-break: break-all;
+      text-align: left;
+    }
+
+    .btn-pix {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: linear-gradient(135deg, var(--green), var(--green-dark));
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.95rem;
+      padding: 14px 28px;
+      border-radius: 50px;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.25s, box-shadow 0.25s;
+      box-shadow: 0 8px 24px rgba(16,185,129,0.35);
+      width: 100%;
+      max-width: 300px;
+    }
+
+    .btn-pix:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 16px 40px rgba(16,185,129,0.5);
+    }
+
+    .pix-copied-msg {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #34d399;
+      background: rgba(16,185,129,0.12);
+      border: 1px solid rgba(16,185,129,0.3);
+      padding: 10px 20px;
+      border-radius: 50px;
+      animation: fadeInUp 0.3s ease;
+    }
+
+    .pix-copied-msg.show { display: inline-flex; }
+
+    /* PIX SVG icon */
+    .pix-svg {
+      width: 36px; height: 36px;
+    }
+
+    /* =============================================
+       CONTACT SECTION (inside footer area)
+    ============================================= */
+    .contact-row {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 40px;
+    }
+
+    .contact-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      padding: 14px 28px;
+      border-radius: 50px;
+      color: #94a3b8;
+      font-size: 0.95rem;
+      transition: all 0.25s;
+    }
+
+    .contact-pill:hover {
+      background: rgba(37,99,235,0.12);
+      border-color: rgba(37,99,235,0.4);
+      color: #60a5fa;
+      transform: translateY(-2px);
+    }
+
+    /* =============================================
+       FOOTER
+    ============================================= */
+    footer {
+      background: #0c1b30;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding: 60px 40px 40px;
+      text-align: center;
+    }
+
+    .footer-logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .footer-logo img {
+      width: 44px;
+      height: 44px;
+      border-radius: 11px;
+    }
+
+    .footer-logo span {
+      font-size: 1.3rem;
+      font-weight: 800;
+      background: linear-gradient(90deg, #60a5fa, #34d399);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .footer-tagline {
+      font-size: 0.95rem;
+      color: #475569;
+      margin-bottom: 8px;
+    }
+
+    .footer-love {
+      font-size: 0.88rem;
+      color: #334155;
+      margin-top: 32px;
+    }
+
+    .footer-love span {
+      color: #ef4444;
+      animation: heartbeat 2s infinite;
+      display: inline-block;
+    }
+
+    .footer-contact a {
+      color: #4b6cb7;
+      font-size: 0.88rem;
+      transition: color 0.2s;
+    }
+
+    .footer-contact a:hover { color: #60a5fa; }
+
+    /* =============================================
+       SCROLL TO TOP
+    ============================================= */
+    #scrollTop {
+      position: fixed;
+      bottom: 32px; right: 32px;
+      width: 50px; height: 50px;
+      background: linear-gradient(135deg, var(--blue), var(--green));
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 24px rgba(37,99,235,0.45);
+      transition: transform 0.25s, opacity 0.25s;
+      z-index: 999;
+    }
+
+    #scrollTop.show { display: flex; }
+    #scrollTop:hover { transform: translateY(-4px) scale(1.05); }
+
+    /* =============================================
+       MOBILE NAV MENU
+    ============================================= */
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: 70px; left: 0; right: 0;
+      background: rgba(20, 48, 82, 0.97);
+      backdrop-filter: blur(20px);
+      padding: 24px 40px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      z-index: 999;
+      animation: fadeInUp 0.25s ease;
+    }
+
+    .mobile-menu.open { display: block; }
+
+    .mobile-menu ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .mobile-menu a {
+      font-size: 1rem;
+      color: #cbd5e1;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .mobile-menu a:hover { color: #fff; }
+
+    /* =============================================
+       RESPONSIVE
+    ============================================= */
+    @media (max-width: 1024px) {
+      .features-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 768px) {
+      nav { padding: 14px 24px; }
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+
+      .hero-container {
+        grid-template-columns: 1fr;
+        padding: 0 24px;
+        text-align: center;
+        gap: 40px;
+      }
+
+      .hero-subtitle { margin: 0 auto 36px; }
+      .hero-actions { justify-content: center; }
+      .hero-stats { justify-content: center; }
+
+      section { padding: 70px 24px; }
+      .section-inner { padding: 0 24px; }
+      .section-full { padding: 70px 0; }
+
+      .features-grid { grid-template-columns: 1fr; }
+      .forwho-grid { grid-template-columns: 1fr; }
+      .support-grid { grid-template-columns: 1fr; }
+
+      .imc-table-wrapper { border-radius: var(--radius-sm); }
+
+      footer { padding: 50px 24px 30px; }
+
+      .mobile-menu { padding: 24px; }
+
+      .macos-window { max-width: 100%; }
+    }
+
+    @media (max-width: 480px) {
+      .btn-primary, .btn-secondary { padding: 14px 22px; font-size: 0.9rem; }
+      h2.section-title { font-size: 1.7rem; }
+    }
+
+    /* =============================================
+       SHIMMER EFFECT FOR SECTION TITLES
+    ============================================= */
+    .shimmer-text {
+      background: linear-gradient(
+        90deg,
+        #f1f5f9 0%,
+        #60a5fa 30%,
+        #34d399 60%,
+        #f1f5f9 90%
+      );
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: shimmer 4s linear infinite;
+    }
+
+    /* =============================================
+       TRUST BADGES
+    ============================================= */
+    .trust-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 32px;
+      margin-top: 80px;
+      flex-wrap: wrap;
+    }
+
+    .trust-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.85rem;
+      color: #475569;
+      font-weight: 500;
+    }
+
+    .trust-item i {
+      font-size: 1.1rem;
+      color: #34d399;
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <!-- ==================== NAVBAR ==================== -->
+  <nav id="navbar">
+    <div class="nav-logo">
+      <img src="https://www.genspark.ai/api/files/s/55DXjKJL" alt="IMC Calculator icon" />
+      <span>IMC Calculator</span>
+    </div>
+    <ul class="nav-links">
+      <li><a href="#features">Recursos</a></li>
+      <li><a href="#forwho">Para Quem</a></li>
+      <li><a href="#imc-table">Tabela IMC</a></li>
+      <li><a href="#support">Apoiar</a></li>
+      <li><a href="#support" class="nav-cta">☕ Apoiar o Dev</a></li>
+    </ul>
+    <div class="hamburger" id="hamburger" aria-label="Menu" role="button" tabindex="0">
+      <span></span><span></span><span></span>
+    </div>
+  </nav>
+
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" id="mobileMenu">
+    <ul>
+      <li><a href="#features" onclick="closeMobileMenu()">Recursos</a></li>
+      <li><a href="#forwho" onclick="closeMobileMenu()">Para Quem</a></li>
+      <li><a href="#imc-table" onclick="closeMobileMenu()">Tabela IMC</a></li>
+      <li><a href="#screenshot" onclick="closeMobileMenu()">App</a></li>
+      <li><a href="#support" onclick="closeMobileMenu()">Apoiar</a></li>
+    </ul>
+  </div>
+
+  <!-- ==================== HERO ==================== -->
+  <section id="hero">
+    <!-- Particles -->
+    <div class="particles-container" id="particles"></div>
+
+    <!-- Orbs -->
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <!-- Grid -->
+    <div class="hero-grid"></div>
+
+    <!-- ECG decoration -->
+    <div class="ecg-bg">
+      <svg viewBox="0 0 1440 80" xmlns="http://www.w3.org/2000/svg" style="width:100%;">
+        <path class="ecg-path" d="M0,40 L200,40 L240,40 L260,10 L280,70 L300,20 L320,60 L340,40 L520,40 L560,40 L580,5 L600,75 L620,15 L640,65 L660,40 L900,40 L940,40 L960,8 L980,72 L1000,18 L1020,62 L1040,40 L1440,40"
+          fill="none" stroke="#2563eb" stroke-width="2" />
+      </svg>
+    </div>
+
+    <div class="hero-container">
+      <!-- Left Content -->
+      <div class="hero-content">
+        <div class="hero-badge">
+          <i class="fa-brands fa-apple"></i>
+          Exclusivo para macOS
+        </div>
+
+        <h1 class="hero-title">
+          Controle seu<br />
+          <span class="gradient-text">IMC & Saúde</span><br />
+          com inteligência
+        </h1>
+
+        <p class="hero-subtitle">
+          Acompanhamento inteligente de peso e saúde para nutricionistas e pacientes.
+          Relatórios, multi-usuário, importação de notas e muito mais — tudo no seu Mac.
+        </p>
+
+        <div class="hero-actions">
+          <a href="https://github.com/maxpicelli/IMC-Calculator/releases" target="_blank" rel="noopener" class="btn-primary">
+            <i class="fa-brands fa-github"></i>
+            Baixar Release
+          </a>
+          <a href="#features" class="btn-secondary">
+            <i class="fa-solid fa-circle-play"></i>
+            Ver Recursos
+          </a>
+        </div>
+
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <div class="num">6+</div>
+            <div class="label">Funcionalidades</div>
+          </div>
+          <div class="hero-stat">
+            <div class="num">macOS</div>
+            <div class="label">Plataforma</div>
+          </div>
+          <div class="hero-stat">
+            <div class="num">100%</div>
+            <div class="label">Gratuito</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Visual -->
+      <div class="hero-visual">
+        <div class="app-showcase">
+          <div class="app-icon-wrapper">
+            <img src="https://www.genspark.ai/api/files/s/55DXjKJL" alt="IMC Calculator – ícone do app" />
+          </div>
+
+          <div class="macos-window">
+            <div class="macos-titlebar">
+              <div class="macos-dot dot-red"></div>
+              <div class="macos-dot dot-yellow"></div>
+              <div class="macos-dot dot-green"></div>
+              <div class="macos-title">IMC Calculator</div>
+            </div>
+            <img
+              class="macos-screenshot"
+              src="https://www.genspark.ai/api/files/s/g1B7SqXM"
+              alt="Screenshot do IMC Calculator"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ==================== FEATURES ==================== -->
+  <div id="features" class="section-full">
+    <div class="section-inner">
+      <div class="reveal">
+        <div class="section-tag"><i class="fa-solid fa-star"></i> Funcionalidades</div>
+        <h2 class="section-title shimmer-text">Tudo que você precisa<br/>para controlar sua saúde</h2>
+        <p class="section-sub">Um app completo, pensado para nutricionistas e pacientes que levam a sério o acompanhamento de saúde.</p>
+      </div>
+
+      <div class="features-grid">
+
+        <div class="feature-card reveal">
+          <div class="feature-icon">📊</div>
+          <h3>Cálculo de IMC</h3>
+          <p>Calcule o Índice de Massa Corporal instantaneamente com classificação automática do grau de obesidade conforme a OMS.</p>
+          <span class="feature-badge">Classificação OMS</span>
+        </div>
+
+        <div class="feature-card reveal">
+          <div class="feature-icon">📅</div>
+          <h3>Controle Diário</h3>
+          <p>Registre seu peso diariamente, visualize o histórico completo e acompanhe sua evolução ao longo do tempo.</p>
+          <span class="feature-badge">Histórico completo</span>
+        </div>
+
+        <div class="feature-card reveal">
+          <div class="feature-icon">📋</div>
+          <h3>Importar do iPhone</h3>
+          <p>Cole notas diretamente do app Notas do iPhone ou de qualquer editor de texto. Integração simples e rápida.</p>
+          <span class="feature-badge">Importação fácil</span>
+        </div>
+
+        <div class="feature-card reveal">
+          <div class="feature-icon">📈</div>
+          <h3>Relatórios Detalhados</h3>
+          <p>Gere relatórios completos com gráficos de evolução e cálculo da média diária de perda de peso.</p>
+          <span class="feature-badge">Média diária</span>
+        </div>
+
+        <div class="feature-card reveal">
+          <div class="feature-icon">👥</div>
+          <h3>Multi-Usuário</h3>
+          <p>Salve e gerencie múltiplos pacientes ou perfis. Ideal para nutricionistas que acompanham vários clientes.</p>
+          <span class="feature-badge">Para clínicas</span>
+        </div>
+
+        <div class="feature-card reveal">
+          <div class="feature-icon">💾</div>
+          <h3>Exportar &amp; Buscar</h3>
+          <p>Exporte relatórios completos para compartilhar, busque no histórico e tenha seus dados sempre organizados.</p>
+          <span class="feature-badge">Exportação completa</span>
+        </div>
+
+      </div>
+
+      <div class="trust-row reveal">
+        <div class="trust-item"><i class="fa-solid fa-shield-halved"></i> Privacidade total – dados locais</div>
+        <div class="trust-item"><i class="fa-solid fa-bolt"></i> Leve e extremamente rápido</div>
+        <div class="trust-item"><i class="fa-solid fa-moon"></i> Suporte a modo escuro</div>
+        <div class="trust-item"><i class="fa-brands fa-apple"></i> Otimizado para macOS</div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ==================== FOR WHOM ==================== -->
+  <section id="forwho">
+    <div class="reveal">
+      <div class="section-tag green"><i class="fa-solid fa-users"></i> Público</div>
+      <h2 class="section-title">Para quem é o<br/><span class="shimmer-text">IMC Calculator?</span></h2>
+      <p class="section-sub">Desenvolvido pensando tanto nos profissionais de saúde quanto nos pacientes que buscam evoluir.</p>
+    </div>
+
+    <div class="forwho-grid">
+
+      <div class="forwho-card professional reveal">
+        <div class="forwho-icon">🩺</div>
+        <h3>Nutricionistas</h3>
+        <p>Acompanhe seus pacientes com eficiência, gere relatórios profissionais e tenha tudo organizado em um só lugar.</p>
+        <ul class="forwho-list">
+          <li><i class="fa-solid fa-check-circle"></i> Gerenciamento multi-paciente</li>
+          <li><i class="fa-solid fa-check-circle"></i> Relatórios para consultas</li>
+          <li><i class="fa-solid fa-check-circle"></i> Histórico detalhado por paciente</li>
+          <li><i class="fa-solid fa-check-circle"></i> Exportação de dados profissional</li>
+          <li><i class="fa-solid fa-check-circle"></i> Acompanhamento de metas</li>
+        </ul>
+      </div>
+
+      <div class="forwho-card patient reveal">
+        <div class="forwho-icon">🏃</div>
+        <h3>Pacientes &amp; Atletas</h3>
+        <p>Assuma o controle da sua saúde, visualize sua evolução e mantenha-se motivado no seu journey fitness.</p>
+        <ul class="forwho-list">
+          <li><i class="fa-solid fa-check-circle"></i> Controle diário de peso</li>
+          <li><i class="fa-solid fa-check-circle"></i> Acompanhe o IMC em tempo real</li>
+          <li><i class="fa-solid fa-check-circle"></i> Veja sua curva de evolução</li>
+          <li><i class="fa-solid fa-check-circle"></i> Importe notas do iPhone</li>
+          <li><i class="fa-solid fa-check-circle"></i> Média de perda por dia</li>
+        </ul>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ==================== IMC TABLE ==================== -->
+  <div id="imc-table" class="section-full">
+    <div class="section-inner">
+      <div class="reveal" style="text-align:center; margin-bottom: 60px;">
+        <div class="section-tag" style="display:inline-flex;"><i class="fa-solid fa-table"></i> Classificação OMS</div>
+        <h2 class="section-title">Tabela de Classificação do IMC</h2>
+        <p class="section-sub" style="margin:0 auto;">Saiba em qual faixa você se enquadra. O IMC Calculator classifica automaticamente cada pesagem.</p>
+      </div>
+
+      <div class="imc-table-wrapper reveal">
+        <table class="imc-table">
+          <thead>
+            <tr>
+              <th>Classificação</th>
+              <th>IMC (kg/m²)</th>
+              <th>Risco à Saúde</th>
+              <th>Referência visual</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="imc-row-1">
+              <td><span class="imc-badge"><span class="imc-dot"></span> Abaixo do peso</span></td>
+              <td>&lt; 18,5</td>
+              <td>Moderado</td>
+              <td>
+                <div class="imc-bar-container">
+                  <div class="imc-bar" style="width:18%; background: #38bdf8;"></div>
+                </div>
+              </td>
+            </tr>
+            <tr class="imc-row-2">
+              <td><span class="imc-badge"><span class="imc-dot"></span> Peso normal</span></td>
+              <td>18,5 – 24,9</td>
+              <td>Baixo (normal)</td>
+              <td>
+                <div class="imc-bar-container">
+                  <div class="imc-bar" style="width:32%; background: #34d399;"></div>
+                </div>
+              </td>
+            </tr>
+            <tr class="imc-row-3">
+              <td><span class="imc-badge"><span class="imc-dot"></span> Sobrepeso</span></td>
+              <td>25 – 29,9</td>
+              <td>Aumentado</td>
+              <td>
+                <div class="imc-bar-container">
+                  <div class="imc-bar" style="width:50%; background: #fbbf24;"></div>
+                </div>
+              </td>
+            </tr>
+            <tr class="imc-row-4">
+              <td><span class="imc-badge"><span class="imc-dot"></span> Obesidade Grau I</span></td>
+              <td>30 – 34,9</td>
+              <td>Moderado</td>
+              <td>
+                <div class="imc-bar-container">
+                  <div class="imc-bar" style="width:65%; background: #fb923c;"></div>
+                </div>
+              </td>
+            </tr>
+            <tr class="imc-row-5">
+              <td><span class="imc-badge"><span class="imc-dot"></span> Obesidade Grau II</span></td>
+              <td>35 – 39,9</td>
+              <td>Grave</td>
+              <td>
+                <div class="imc-bar-container">
+                  <div class="imc-bar" style="width:80%; background: #f97316;"></div>
+                </div>
+              </td>
+            </tr>
+            <tr class="imc-row-6">
+              <td><span class="imc-badge"><span class="imc-dot"></span> Obesidade Grau III</span></td>
+              <td>≥ 40</td>
+              <td>Muito grave</td>
+              <td>
+                <div class="imc-bar-container">
+                  <div class="imc-bar" style="width:100%; background: #ef4444;"></div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ==================== SCREENSHOT ==================== -->
+  <section id="screenshot" style="text-align:center;">
+    <div class="reveal">
+      <div class="section-tag green" style="display:inline-flex;"><i class="fa-solid fa-desktop"></i> Interface</div>
+      <h2 class="section-title">Veja o app em ação</h2>
+      <p class="section-sub" style="margin:0 auto;">Design clean e intuitivo, pensado para uso diário por profissionais e pacientes.</p>
+    </div>
+
+    <div class="screenshot-wrap reveal">
+      <div class="screenshot-glow"></div>
+      <div class="screenshot-macos">
+        <div class="macos-titlebar">
+          <div class="macos-dot dot-red"></div>
+          <div class="macos-dot dot-yellow"></div>
+          <div class="macos-dot dot-green"></div>
+          <div class="macos-title">IMC Calculator — Relatório do Paciente</div>
+        </div>
+        <img
+          src="https://www.genspark.ai/api/files/s/g1B7SqXM"
+          alt="Screenshot do IMC Calculator mostrando o painel principal"
+        />
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ==================== SUPPORT ==================== -->
+  <section id="support">
+    <div class="reveal" style="text-align:center;">
+      <div class="section-tag" style="display:inline-flex;"><i class="fa-solid fa-heart"></i> Apoie</div>
+      <h2 class="section-title">Gostou do app?<br/><span class="shimmer-text">Apoie o desenvolvimento!</span></h2>
+      <p class="section-sub" style="margin:0 auto;">Este projeto é desenvolvido com muito carinho. Sua contribuição ajuda a manter e melhorar o IMC Calculator.</p>
+    </div>
+
+    <div class="support-grid">
+
+      <!-- Coffee / PayPal Card -->
+      <div class="support-card coffee reveal">
+        <div class="support-icon">☕</div>
+        <h3>Buy Me a Coffee</h3>
+        <p>Me pague um café para continuar desenvolvendo ferramentas de saúde gratuitas para a comunidade!</p>
+
+        <div class="support-actions">
+          <a href="https://buymeacoffee.com" target="_blank" rel="noopener" class="btn-coffee">
+            ☕ &nbsp;Buy Me a Coffee
+          </a>
+
+          <a href="https://www.paypal.com/paypalme/picelli1974" target="_blank" rel="noopener" class="paypal-btn">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="#0070ba" xmlns="http://www.w3.org/2000/svg">
+              <path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.291-.077.448-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.095zm14.146-14.42a3.35 3.35 0 0 0-.607-.541c-.013.076-.026.175-.041.254-.59 3.024-2.62 6.445-8.067 6.445h-2.19l-1.36 8.63H12.9l.353-2.234.005-.026h.012l1.217-7.72.078-.486h.009c.08-.518.524-.9 1.048-.9h.639c4.298 0 6.614-1.747 7.453-5.422z"/>
+            </svg>
+            Pagar via PayPal
+          </a>
+
+          <div style="font-size:0.78rem; color:#475569; margin-top:4px;">
+            <i class="fa-solid fa-envelope" style="color:#64748b; margin-right:6px;"></i>
+            picelli1974@outlook.com
+          </div>
+        </div>
+      </div>
+
+      <!-- PIX Card -->
+      <div class="support-card pix reveal">
+        <div class="support-icon">
+          <!-- Pix SVG icon -->
+          <svg class="pix-svg" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+            <path fill="#32BCAD" d="M393.6 320.8c-22.4 0-43.4-8.7-59.2-24.5l-82.7-82.7c-5.9-5.9-16.2-5.9-22.2 0l-83 83c-15.8 15.8-36.8 24.5-59.2 24.5h-16.5L169 424.4c21.2 21.2 55.5 21.2 76.7 0l102.3-102.3c5.9-5.9 16.2-5.9 22.2 0l102.3 102.3c21.2 21.2 55.5 21.2 76.7 0l98.2-103.6h-16.5z"/>
+            <path fill="#32BCAD" d="M87.3 191.2c22.4 0 43.4 8.7 59.2 24.5l83 83c6.1 6.1 16.1 6.1 22.2 0l82.7-82.7c15.8-15.8 36.8-24.5 59.2-24.5h11.9L303.2 87.6c-21.2-21.2-55.5-21.2-76.7 0L124.2 189.9c-5.9 5.9-16.2 5.9-22.2 0L-0.3 87.6C-21.5 66.4-55.8 66.4-77 87.6l-99 104.2h13.3z"/>
+          </svg>
+        </div>
+        <h3>Contribua via Pix</h3>
+        <p>Rápido, gratuito e direto. Qualquer valor é muito bem-vindo e ajuda a manter o projeto vivo!</p>
+
+        <div class="pix-key-box">
+          <span class="pix-key-value" id="pixKeyText">picelli1974@icloud.com</span>
+          <button onclick="copyPixKey()" style="background:none;border:none;cursor:pointer;color:#34d399;font-size:1rem;" title="Copiar">
+            <i class="fa-solid fa-copy"></i>
+          </button>
+        </div>
+
+        <button class="btn-pix" onclick="copyPixKey()">
+          <i class="fa-solid fa-copy"></i>
+          Copiar Chave Pix
+        </button>
+
+        <div class="pix-copied-msg" id="pixCopiedMsg">
+          <i class="fa-solid fa-circle-check"></i>
+          Chave copiada! ✓
+        </div>
+
+        <div style="font-size:0.78rem; color:#475569; margin-top:4px;">
+          <i class="fa-solid fa-lock" style="color:#34d399; margin-right:6px;"></i>
+          Transferência segura pelo Pix
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Contact -->
+    <div class="contact-row" style="margin-top: 60px;">
+      <a href="mailto:picelli1974@icloud.com" class="contact-pill">
+        <i class="fa-solid fa-envelope"></i>
+        Entre em contato: picelli1974@icloud.com
+        <i class="fa-solid fa-arrow-right" style="font-size:0.85rem;"></i>
+      </a>
+    </div>
+
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer>
+    <div class="footer-logo">
+      <img src="https://www.genspark.ai/api/files/s/55DXjKJL" alt="IMC Calculator" />
+      <span>IMC Calculator</span>
+    </div>
+
+    <p class="footer-tagline">Acompanhamento inteligente de peso e saúde para macOS</p>
+
+    <div class="footer-contact" style="margin-top:16px;">
+      <a href="mailto:picelli1974@icloud.com">
+        <i class="fa-solid fa-envelope" style="margin-right:6px;"></i>picelli1974@icloud.com
+      </a>
+    </div>
+
+    <p class="footer-love">
+      Desenvolvido com <span>❤️</span> para a comunidade de saúde &nbsp;·&nbsp; © 2026 IMC Calculator
+    </p>
+  </footer>
+
+  <!-- Scroll to top button -->
+  <button id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Voltar ao topo">
+    <i class="fa-solid fa-chevron-up"></i>
+  </button>
+
+  <!-- ==================== JAVASCRIPT ==================== -->
+  <script>
+    // =============================================
+    // PARTICLES
+    // =============================================
+    (function createParticles() {
+      const container = document.getElementById('particles');
+      const symbols = ['●', '♥', '＋', '◆', '○', '×'];
+      const colors  = ['rgba(37,99,235,0.5)', 'rgba(16,185,129,0.45)', 'rgba(14,165,233,0.45)', 'rgba(167,139,250,0.35)'];
+      const count = 30;
+
+      for (let i = 0; i < count; i++) {
+        const el = document.createElement('div');
+        el.classList.add('particle');
+
+        const size  = Math.random() * 10 + 4;
+        const left  = Math.random() * 100;
+        const delay = Math.random() * 12;
+        const dur   = Math.random() * 10 + 8;
+        const color = colors[Math.floor(Math.random() * colors.length)];
+
+        el.style.cssText = `
+          width: ${size}px;
+          height: ${size}px;
+          left: ${left}%;
+          bottom: -20px;
+          background: ${color};
+          animation-duration: ${dur}s;
+          animation-delay: -${delay}s;
+          opacity: ${Math.random() * 0.5 + 0.2};
+        `;
+        container.appendChild(el);
+      }
+    })();
+
+    // =============================================
+    // NAVBAR SCROLL
+    // =============================================
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('scrolled', window.scrollY > 60);
+
+      const scrollTopBtn = document.getElementById('scrollTop');
+      scrollTopBtn.classList.toggle('show', window.scrollY > 400);
+    });
+
+    // =============================================
+    // HAMBURGER MENU
+    // =============================================
+    const hamburger   = document.getElementById('hamburger');
+    const mobileMenu  = document.getElementById('mobileMenu');
+
+    hamburger.addEventListener('click', () => {
+      mobileMenu.classList.toggle('open');
+    });
+
+    function closeMobileMenu() {
+      mobileMenu.classList.remove('open');
+    }
+
+    // =============================================
+    // SCROLL REVEAL
+    // =============================================
+    const revealEls = document.querySelectorAll('.reveal');
+
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry, idx) => {
+        if (entry.isIntersecting) {
+          // Stagger siblings inside the same parent
+          const siblings = Array.from(entry.target.parentElement.querySelectorAll('.reveal'));
+          const siblingsIdx = siblings.indexOf(entry.target);
+          const delay = siblingsIdx * 80;
+
+          setTimeout(() => {
+            entry.target.classList.add('visible');
+          }, delay);
+
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
+
+    revealEls.forEach(el => revealObserver.observe(el));
+
+    // =============================================
+    // IMC TABLE BARS ANIMATION
+    // =============================================
+    const tableObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const bars = entry.target.querySelectorAll('.imc-bar');
+          bars.forEach(bar => {
+            const target = bar.style.width;
+            bar.style.width = '0';
+            setTimeout(() => { bar.style.width = target; }, 300);
+          });
+          tableObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.2 });
+
+    const tableEl = document.querySelector('.imc-table-wrapper');
+    if (tableEl) tableObserver.observe(tableEl);
+
+    // =============================================
+    // COPY PIX KEY
+    // =============================================
+    function copyPixKey() {
+      const key = document.getElementById('pixKeyText').textContent.trim();
+      const msg = document.getElementById('pixCopiedMsg');
+
+      navigator.clipboard.writeText(key).then(() => {
+        msg.classList.add('show');
+        setTimeout(() => msg.classList.remove('show'), 3000);
+      }).catch(() => {
+        // Fallback
+        const textarea = document.createElement('textarea');
+        textarea.value = key;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        msg.classList.add('show');
+        setTimeout(() => msg.classList.remove('show'), 3000);
+      });
+    }
+
+    // =============================================
+    // SMOOTH ANCHOR LINKS (offset for fixed nav)
+    // =============================================
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        const targetId = this.getAttribute('href');
+        if (targetId === '#') return;
+        const targetEl = document.querySelector(targetId);
+        if (targetEl) {
+          e.preventDefault();
+          const offset = 80;
+          const top = targetEl.getBoundingClientRect().top + window.pageYOffset - offset;
+          window.scrollTo({ top, behavior: 'smooth' });
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>
