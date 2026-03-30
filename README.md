@@ -36,6 +36,7 @@ README.md    ← Esta documentação
 ## 🌐 Links
 - **Repositório:** https://github.com/maxpicelli/IMC-Calculator
 - **GitHub Pages:** https://maxpicelli.github.io/IMC-Calculator/
+- **Download da Release:** https://github.com/maxpicelli/IMC-Calculator/releases/download/v1.0.0/IMC-Calculator-PT-Br.dmg
 
 > Se a URL da GitHub Pages abrir `404`, basta ativar em **Settings > Pages** no repositório e publicar a branch `main` na pasta raiz (`/root`).
 
@@ -51,7 +52,6 @@ README.md    ← Esta documentação
 - **Estilo:** Premium, dark mode, glassmorphism, Apple-inspired
 
 ## 🔧 Próximos Passos Sugeridos
-- [ ] Adicionar link final da release pública no GitHub
 - [ ] Adicionar link real do Buy Me a Coffee
 - [ ] Adicionar seção de FAQ
 - [ ] Adicionar calculadora de IMC interativa na própria página
