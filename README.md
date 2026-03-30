@@ -36,7 +36,7 @@ README.md    ← Esta documentação
 ## 🌐 Links
 - **Repositório:** https://github.com/maxpicelli/IMC-Calculator
 - **GitHub Pages:** https://maxpicelli.github.io/IMC-Calculator/
-- **Download da Release:** https://github.com/maxpicelli/IMC-Calculator/releases/download/v1.0.0/IMC-Calculator-PT-Br.dmg
+- **Download da Release:** https://github.com/maxpicelli/IMC-Calculator/releases/latest/download/IMC-Calculator-PT-Br.dmg
 
 > Se a URL da GitHub Pages abrir `404`, basta ativar em **Settings > Pages** no repositório e publicar a branch `main` na pasta raiz (`/root`).
 
