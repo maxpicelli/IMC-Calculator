@@ -891,6 +891,31 @@
       display: block;
     }
 
+    .demo-video-wrap {
+      max-width: 860px;
+      margin: 36px auto 0;
+      border-radius: 22px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: 0 30px 80px rgba(0,0,0,0.35);
+      background: rgba(9, 20, 35, 0.55);
+      backdrop-filter: blur(10px);
+    }
+
+    .demo-video-frame {
+      position: relative;
+      width: 100%;
+      padding-top: 56.25%;
+    }
+
+    .demo-video-frame iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
     /* =============================================
        SUPPORT SECTION
     ============================================= */
@@ -1674,7 +1699,7 @@
     <div class="reveal">
       <div class="section-tag green" style="display:inline-flex;"><i class="fa-solid fa-desktop"></i> Interface</div>
       <h2 class="section-title">Veja o app em ação</h2>
-      <p class="section-sub" style="margin:0 auto;">Design clean e intuitivo, pensado para uso diário por profissionais e pacientes.</p>
+      <p class="section-sub" style="margin:0 auto;">Design clean e intuitivo, pensado para uso diário por profissionais e pacientes. Assista ao vídeo de demonstração e veja o fluxo do app na prática.</p>
     </div>
 
     <div class="screenshot-wrap reveal">
@@ -1690,6 +1715,19 @@
           src="Captura%20de%20Tela%202026-03-30%20%C3%A0s%2020.31.05.png"
           alt="Screenshot do IMC Calculator mostrando o painel principal"
         />
+      </div>
+    </div>
+
+    <div class="demo-video-wrap reveal">
+      <div class="demo-video-frame">
+        <iframe
+          src="https://www.youtube.com/embed/So5JeTo3E68"
+          title="Vídeo de demonstração do IMC Calculator"
+          loading="lazy"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          referrerpolicy="strict-origin-when-cross-origin"
+          allowfullscreen>
+        </iframe>
       </div>
     </div>
   </section>

@@ -13,6 +13,7 @@ Página marketing/landing page estilo GitHub Pages para divulgar o app IMC Calcu
 - **Para Quem É** – Dois cards: Nutricionistas (azul) e Pacientes/Atletas (verde)
 - **Tabela IMC** – Tabela interativa com classificações OMS e barras de progresso animadas
 - **Screenshot** – Mockup macOS com screenshot real do app
+- **Vídeo de Demonstração** – Player embutido do YouTube com demonstração prática do app
 - **Apoie o Projeto** – Cards de Buy Me a Coffee/PayPal e Pix com botão copiar
 - **Footer** – Contato, copyright e tagline
 
@@ -23,6 +24,7 @@ Página marketing/landing page estilo GitHub Pages para divulgar o app IMC Calcu
 - ✅ Scroll reveal com IntersectionObserver
 - ✅ Barras de progresso da tabela IMC com animação ao entrar na tela
 - ✅ Botão "Copiar Chave Pix" com feedback visual
+- ✅ Vídeo de demonstração embutido e responsivo
 - ✅ Botão scroll-to-top
 - ✅ 100% responsivo (mobile-first)
 - ✅ Arquivo único index.html
