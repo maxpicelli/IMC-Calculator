@@ -8,6 +8,12 @@
   <meta property="og:title" content="IMC Calculator – Saúde e Bem-Estar no macOS" />
   <meta property="og:description" content="Acompanhe o IMC, controle diário de peso, relatórios e muito mais para nutricionistas e pacientes." />
   <title>IMC Calculator – Saúde Inteligente para macOS</title>
+  <meta name="theme-color" content="#16345d" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="IMC Calculator" />
+  <link rel="icon" type="image/png" sizes="1024x1024" href="IMC%20Calculator.png?v=20260331" />
+  <link rel="shortcut icon" type="image/png" href="IMC%20Calculator.png?v=20260331" />
+  <link rel="apple-touch-icon" href="IMC%20Calculator.png?v=20260331" />
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -41,13 +47,17 @@
       --shadow-lg:  0 20px 60px rgba(0,0,0,0.4);
     }
 
-    html { scroll-behavior: smooth; }
+    html {
+      scroll-behavior: smooth;
+      overflow-x: hidden;
+    }
 
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       background: linear-gradient(180deg, #16345d 0%, #133154 28%, #102845 55%, #0d2036 100%);
       color: #e2e8f0;
       overflow-x: hidden;
+      max-width: 100%;
       line-height: 1.65;
     }
 
@@ -1164,6 +1174,7 @@
       border-radius: 50px;
       color: #94a3b8;
       font-size: 0.95rem;
+      max-width: 100%;
       transition: all 0.25s;
     }
 
@@ -1301,9 +1312,11 @@
       nav { padding: 14px 24px; }
       .nav-links { display: none; }
       .hamburger { display: flex; }
+      .nav-logo { min-width: 0; }
 
       .hero-container {
         grid-template-columns: 1fr;
+        width: 100%;
         padding: 0 24px;
         text-align: center;
         gap: 40px;
@@ -1311,7 +1324,10 @@
 
       .hero-subtitle { margin: 0 auto 36px; }
       .hero-actions { justify-content: center; }
-      .hero-stats { justify-content: center; }
+      .hero-stats {
+        justify-content: center;
+        flex-wrap: wrap;
+      }
 
       section { padding: 70px 24px; }
       .section-inner { padding: 0 24px; }
@@ -1328,10 +1344,32 @@
       .mobile-menu { padding: 24px; }
 
       .macos-window { max-width: 100%; }
+      .screenshot-wrap,
+      .screenshot-macos,
+      .demo-video-wrap { width: 100%; }
+
+      .contact-pill {
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+        text-align: center;
+      }
     }
 
     @media (max-width: 480px) {
+      nav { padding: 14px 18px; }
+      .nav-logo img {
+        width: 32px;
+        height: 32px;
+      }
+      .nav-logo span { font-size: 1rem; }
+      .hero-container { padding: 0 18px; }
+      .hero-stats { gap: 18px; }
       .btn-primary, .btn-secondary { padding: 14px 22px; font-size: 0.9rem; }
+      section { padding: 64px 18px; }
+      .section-inner { padding: 0 18px; }
+      .mobile-menu { padding: 20px 18px; }
+      .contact-pill { font-size: 0.88rem; }
       h2.section-title { font-size: 1.7rem; }
     }
 
