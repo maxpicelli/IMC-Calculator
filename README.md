@@ -23,7 +23,7 @@ Página marketing/landing page estilo GitHub Pages para divulgar o app IMC Calcu
 - ✅ ECG/pulsação cardíaca decorativa em SVG
 - ✅ Scroll reveal com IntersectionObserver
 - ✅ Barras de progresso da tabela IMC com animação ao entrar na tela
-- ✅ Botão "Copiar Chave Pix" com feedback visual
+- ✅ Chave Pix copiável com feedback visual
 - ✅ Vídeo de demonstração embutido e responsivo
 - ✅ Botão scroll-to-top
 - ✅ 100% responsivo (mobile-first)
